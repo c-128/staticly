@@ -47,6 +47,9 @@ func (hand *Handler) ServeHTTP(writer http.ResponseWriter, req *http.Request) {
 	case os.IsNotExist(err):
 		writer.WriteHeader(http.StatusNotFound)
 		return
+	case os.IsPermission(err):
+		writer.WriteHeader(http.StatusForbidden)
+		return
 	case err != nil:
 		writer.WriteHeader(http.StatusInternalServerError)
 		return
