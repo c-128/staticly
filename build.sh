@@ -1,7 +1,6 @@
 #!/bin/bash
 
 mkdir -p build
-mkdir -p build/server
 rm -rf build/*
 
 for os in "linux" "windows" "darwin"; do
@@ -11,6 +10,6 @@ for os in "linux" "windows" "darwin"; do
             output="$output.exe"
         fi
 
-        GOOS=$os GOARCH=$arch go build -o build/server/$output server/*.go
+        GOOS=$os GOARCH=$arch go build -o build/$output server/*.go
     done
 done
