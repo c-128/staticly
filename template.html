@@ -1,0 +1,91 @@
+{{define "directory"}}
+
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>{{ .Title }}</title>
+        <style>
+            * {
+                background-color: #212529;
+                color: #ced4da;
+                font-family: monospace;
+            }
+
+            button,
+            select {
+                background: transparent;
+                border: 0.3rem #495057 solid;
+            }
+
+            button {
+                cursor: pointer;
+            }
+
+            table {
+                width: 100%;
+            }
+
+            th {
+                text-align: left;
+            }
+
+            #column_type {
+                width: 3%;
+            }
+
+            #column_name {
+                width: 15%;
+            }
+        </style>
+    </head>
+    <body>
+        <h1>{{ .Path }}</h1>
+
+        <table>
+            <tr>
+                <th id="column_type">Type</th>
+                <th id="column_name">Name</th>
+                <th id="column_last_modified">Last Modified</th>
+            </tr>
+
+            <tr>
+                <td>&#x1F4C2;</td>
+                <td><a href="..">..</a></td>
+                <td></td>
+            </tr>
+
+            {{ range $Entry := .Entries }}
+            <tr>
+                {{ if $Entry.IsFile }}
+                <td>&#x1F4C4;</td>
+                {{ else if $Entry.IsDirectory }}
+                <td>&#x1F4C2;</td>
+                {{ else }}
+                <td>&#x2753;</td>
+                {{ end }}
+
+                <td>
+                    <a href="./{{ $Entry.Name }}/">{{ $Entry.Name }}</a>
+                </td>
+
+                <td>
+                    {{ $Entry.LastModified.Format "02.01.2006 15:04:05 MST" }}
+                </td>
+            </tr>
+            {{ end }}
+        </table>
+
+        <form method="get">
+            <select name="sort_by">
+                <option value="type">Type</option>
+                <option value="name">Name</option>
+            </select>
+
+            <button type="submit">Sort</button>
+        </form>
+    </body>
+</html>
+
+{{end}}
