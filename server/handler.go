@@ -78,8 +78,6 @@ func (hand *Handler) serveFile(name string, fileInfo os.FileInfo, writer http.Re
 }
 
 func (hand *Handler) serveDirectory(name string, writer http.ResponseWriter, req *http.Request) {
-	query := req.URL.Query()
-	sortBy := query.Get("sort_by")
 
 	rawEntries, err := os.ReadDir(name)
 	if err != nil {
@@ -110,6 +108,27 @@ func (hand *Handler) serveDirectory(name string, writer http.ResponseWriter, req
 		entries[i] = entry
 	}
 
+	hand.sortEntires(
+		req.URL.Query().Get("sort_by"),
+		entries,
+	)
+
+	err = hand.Template.ExecuteTemplate(
+		writer,
+		"directory",
+		map[string]any{
+			"Title":   hand.Title,
+			"Path":    req.URL.Path,
+			"Entries": entries,
+		},
+	)
+	if err != nil {
+		writer.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+}
+
+func (handler *Handler) sortEntires(sortBy string, entries []DirEntry) {
 	switch sortBy {
 	case "type", "":
 		sort.Slice(entries, func(i, j int) bool {
@@ -144,19 +163,9 @@ func (hand *Handler) serveDirectory(name string, writer http.ResponseWriter, req
 
 			return false
 		})
-	}
-
-	err = hand.Template.ExecuteTemplate(
-		writer,
-		"directory",
-		map[string]any{
-			"Title":   hand.Title,
-			"Path":    req.URL.Path,
-			"Entries": entries,
-		},
-	)
-	if err != nil {
-		writer.WriteHeader(http.StatusInternalServerError)
-		return
+	case "last_modified":
+		sort.Slice(entries, func(i, j int) bool {
+			return entries[i].LastModified.Before(entries[j].LastModified)
+		})
 	}
 }
