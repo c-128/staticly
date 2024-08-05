@@ -2,7 +2,7 @@ FROM golang:1.22.4 AS build
 
 WORKDIR /src
 COPY . .
-RUN go build -o /staticly *.go
+RUN go build -o /staticly server/*.go
 
 FROM debian:latest AS run
 
